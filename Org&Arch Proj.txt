@@ -1,0 +1,136 @@
+	ORG 100 //Tyler Williams
+top,	Input		//accept input
+	Store oper	//store input in oper
+	Output		//output the input
+	load oper	//operator will now be checked for validity
+if,	subt fourt	//subtract 14 from operator
+	skipcond 000	//if result is negative, operator isn't too big, so skip error
+	jump errIf
+	load oper	
+	subt nine	//subtract 9 from oper
+	skipcond 800	//if result is positive, operator isn't too small, so skip error
+	jump errIf
+num1In,	input		//start taking the numbers to be operated on
+	store ifCh
+	output
+	jns ifNum	//jump to check if number is 1-9
+	subt hund	//if error was thrown, this will = 0
+	skipcond 000
+	jump num1In
+	load ifCh
+	store in1
+num2In,	input		//take the second number to be operated on
+	store ifCh
+	output
+	jns ifNum	//jump to check if number is 1-9
+	subt hund	//if error was thrown, this will = 0
+	skipcond 000
+	jump num2In
+	load ifCh
+	store in2
+opFind,	load oper	//load the operator number, and use ifs to find the operation
+	subt ten
+	skipcond 400
+	jump opF1	//if oper - 10 isn't 0, jump to next check
+	jump opA	//else jump to addition
+opF1,	load oper
+	subt elev
+	skipcond 400
+	jump opF2	//if oper - 11 isn't 0, jump to next check
+	jump opS	//else jump to subtraction
+opF2,	load oper
+	subt twel
+	skipcond 400
+	jump opD	//if oper - 12 isn't 0, jump to division
+	jump opM	//else jump to multiplication
+
+opA,	load in1	//simple addition
+	add in2
+	output
+	jump top
+
+opS,	load in1	//simple subtraction
+	subt in2
+	output
+	jump top
+
+opM,	load in1	//subroutine for multiplication
+	store oper	//store in1 in oper to use as an answ variable
+loopM,	load in2	//use loop to perform multiplication. for loop. -1 for each run until 0
+	subt one
+	store in2
+	skipcond 800
+	jump loopEn
+	load oper	//load the oper (repurposed for multip), add in1, store
+	add in1
+	store oper
+	jump loopM
+loopEn,	load oper
+	output
+	jump top
+
+opD,	load zero
+	store oper
+loopD,	load in1	//load in1, subtract in2, if result is negative, don't store result
+	subt in2
+	store sav
+	skipcond 000
+	store in1
+	skipcond 400
+	jump neSki	//in case the final result is 0, use this to increase div count
+	jns inCoun
+neSki,	load sav
+	skipcond 800	//if result is positive, don't jump to end. if 0 or negative, skip
+	jump looEnd
+	load oper	//use oper as a counter to keep track of divisor.
+	add one		//remainder will be stored in in1
+	store oper
+	jump loopD
+	
+inCoun,	load oper
+	load oper
+	add one
+	store oper
+	jumpi inCoun
+
+looEnd,	load oper
+	output
+	load in1
+	output
+	jump top
+
+ifNum,	load ifCh	//check if numbers are valid for calculator
+	load ifCh
+	subt ten
+	skipcond 000	//if ifCh - 10 is positive or 0, throw error
+	jns errIf2
+	load ifCh
+	skipcond 800	//if ifCh isn't positive without any modification, throw error
+	jns errIf2
+	jumpi ifNum	//returns with either the proper value if correct, or 100 if incorrect
+
+errIf,	load hund	//thrown if operator is wrong
+	output
+	jump top
+
+errIf2,	load hund	//thrown if num is wrong
+	load hund
+	output
+	store ifCh
+	jumpi errIf2
+	
+
+sav,	dec 0
+oper,	dec 0
+in1,	dec 0
+in2,	dec 0
+ifCh,	dec 0
+zero,	dec 0
+one,	dec 1
+nine,	dec 9
+ten,	dec 10
+elev,	dec 11
+twel,	dec 12
+thirt,	dec 13
+fourt,	dec 14
+hund,	dec 100
